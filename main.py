@@ -46,7 +46,7 @@ def process_bart_excel(file_path, year, month):
 
 all_dfs = []
 
-for year in [2019, 2020, 2021]:
+for year in [2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]:
     for month in [f'{m:02d}' for m in range(1, 13)]:
         bart_path = f'datasets/bart/ridership_{year}/Ridership_{year}{month}.xlsx'
         if os.path.exists(bart_path):
@@ -56,6 +56,8 @@ for year in [2019, 2020, 2021]:
 if all_dfs:
     master_df = pd.concat(all_dfs, ignore_index=True)
     master_df = master_df[master_df['Exit_Station'] != 'Entries']
+    master_df = master_df[master_df['Exit_Station'] != 'Grand Total']
+    master_df = master_df.dropna(subset=['Exit_Station'])
     master_df.to_csv('all_bart_data.csv', index=False)
     print("Success! File saved as all_bart_data.csv")
 else:
