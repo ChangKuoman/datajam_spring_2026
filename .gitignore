@@ -1,6 +1,4 @@
 datasets/
+clean_datasets/
 venv/
 __pycache__/'
-
-all_bart_data.csv
-bart_monthly_summary.csv
