@@ -36,12 +36,12 @@ def parse_estimate(value):
 def main():
     years = [2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024]
     OUTPUT_FILE = r"WFH.csv"
-    
+
     all_dfs = []
-    
+
     for i in years:
         INPUT_FILE = r"datasets\work\[CLEAN] " + str(i) + " ACS 5-Year Estimates Detailed Tables.csv"
-        
+
         df = load_table(INPUT_FILE)
 
         df.columns = [clean_text(c) for c in df.columns]
@@ -72,18 +72,30 @@ def main():
         long_df["estimate"] = long_df["estimate"].apply(parse_estimate)
 
         long_df = long_df.dropna(subset=["estimate"])
-        
+
         # Add year column
         long_df["year"] = i
-        
+
         all_dfs.append(long_df)
-    
+
     # Combine all years
     combined_df = pd.concat(all_dfs, ignore_index=True)
 
+    combined_df = pd.read_csv(OUTPUT_FILE)
+
+    combined_df["Label (Grouping)"].replace({
+        "Worked at home": "Worked from home",
+        "Public transportation (excluding taxicab)": "Public transportation",
+        "Taxicab, motorcycle, bicycle, or other means": "Taxi or ride-hailing services, motorcycle, bicycle, or other means"
+        }, inplace=True)
+
+    combined_df.rename(columns={"Label (Grouping)": "method"}, inplace=True)
+
+    combined_df["county"] = combined_df["county"].str.replace(", California", "")
+
     combined_df.to_csv(OUTPUT_FILE, index=False)
+
     print(f"Saved: {OUTPUT_FILE}")
-    print(combined_df.head(20))
     print(f"Rows written: {len(combined_df)}")
 
 
